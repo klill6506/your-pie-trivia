@@ -72,12 +72,12 @@
                                 const isCompleted = completedCategories.includes(cat);
                                 const startAngle = (index * 60 - 90) * (Math.PI / 180);
                                 const endAngle = ((index + 1) * 60 - 90) * (Math.PI / 180);
-                                
+
                                 const x1 = 50 + 45 * Math.cos(startAngle);
                                 const y1 = 50 + 45 * Math.sin(startAngle);
                                 const x2 = 50 + 45 * Math.cos(endAngle);
                                 const y2 = 50 + 45 * Math.sin(endAngle);
-                                
+
                                 return (
                                     <g key={cat}>
                                         <path
@@ -112,13 +112,13 @@
                     const categoryId = categoryMapping[category];
                     const response = await fetch(`https://opentdb.com/api.php?amount=${amount}&category=${categoryId}&type=multiple`);
                     const data = await response.json();
-                    
+
                     if (data.response_code === 0) {
                         const formattedQuestions = data.results.map(q => {
                             const incorrectAnswers = q.incorrect_answers.map(a => decodeHTML(a));
                             const correctAnswer = decodeHTML(q.correct_answer);
                             const allAnswers = [...incorrectAnswers, correctAnswer].sort(() => Math.random() - 0.5);
-                            
+
                             return {
                                 question: decodeHTML(q.question),
                                 answers: allAnswers,
@@ -141,13 +141,13 @@
                 try {
                     const response = await fetch('https://opentdb.com/api.php?amount=1&difficulty=hard&type=multiple');
                     const data = await response.json();
-                    
+
                     if (data.response_code === 0 && data.results.length > 0) {
                         const q = data.results[0];
                         const incorrectAnswers = q.incorrect_answers.map(a => decodeHTML(a));
                         const correctAnswer = decodeHTML(q.correct_answer);
                         const allAnswers = [...incorrectAnswers, correctAnswer].sort(() => Math.random() - 0.5);
-                        
+
                         return {
                             question: decodeHTML(q.question),
                             answers: allAnswers,
@@ -174,11 +174,11 @@
             const getRandomQuestion = (category) => {
                 const questions = questionCache[category];
                 if (!questions || questions.length === 0) return null;
-                
+
                 // Filter out used questions
                 const used = usedQuestions[category] || [];
                 const availableQuestions = questions.filter(q => !used.includes(q.id));
-                
+
                 // If we've used all questions, reset for this category
                 if (availableQuestions.length === 0) {
                     const newUsed = { ...usedQuestions };
@@ -186,65 +186,65 @@
                     setUsedQuestions(newUsed);
                     return questions[Math.floor(Math.random() * questions.length)];
                 }
-                
+
                 const randomIndex = Math.floor(Math.random() * availableQuestions.length);
                 const selectedQuestion = availableQuestions[randomIndex];
-                
+
                 // Mark this question as used
                 const newUsed = { ...usedQuestions };
                 if (!newUsed[category]) newUsed[category] = [];
                 newUsed[category].push(selectedQuestion.id);
                 setUsedQuestions(newUsed);
-                
+
                 return selectedQuestion;
             };
 
             const handlePlayerNamesSubmit = async (names) => {
                 setLoading(true);
-                
+
                 const initialPlayers = names.map(name => ({
                     name: name,
                     completedCategories: [],
                     finishedRound: null,
                 }));
-                
+
                 setPlayers(initialPlayers);
-                
+
                 // Initialize used questions tracker
                 const initialUsed = {};
                 categories.forEach(cat => {
                     initialUsed[cat] = [];
                 });
                 setUsedQuestions(initialUsed);
-                
+
                 const cache = {};
                 for (let i = 0; i < categories.length; i++) {
                     const cat = categories[i];
                     setLoadingMessage(`Loading ${cat} questions... (${i + 1}/${categories.length})`);
                     const questions = await fetchQuestions(cat, 30);
                     cache[cat] = questions;
-                    
+
                     if (i < categories.length - 1) {
                         await sleep(5000);
                     }
                 }
-                
+
                 setQuestionCache(cache);
                 setCurrentPlayerIndex(0);
-                
+
                 const randomCat = getRandomCategory();
                 setCurrentCategory(randomCat);
-                
+
                 if (cache[randomCat] && cache[randomCat].length > 0) {
                     const randomQ = cache[randomCat][Math.floor(Math.random() * cache[randomCat].length)];
                     setCurrentQuestion(randomQ);
-                    
+
                     // Mark first question as used
                     const newUsed = { ...initialUsed };
                     newUsed[randomCat] = [randomQ.id];
                     setUsedQuestions(newUsed);
                 }
-                
+
                 setGameStarted(true);
                 setShowPlayerSetup(false);
                 setLoading(false);
@@ -260,22 +260,22 @@
             const handleNextQuestion = async () => {
                 const currentPlayer = players[currentPlayerIndex];
                 const isCorrect = selectedAnswer === currentQuestion.correct;
-                
+
                 if (isCorrect) {
                     const updatedPlayers = [...players];
                     if (!updatedPlayers[currentPlayerIndex].completedCategories.includes(currentCategory)) {
                         updatedPlayers[currentPlayerIndex].completedCategories.push(currentCategory);
                     }
-                    
+
                     if (updatedPlayers[currentPlayerIndex].completedCategories.length === 6) {
                         updatedPlayers[currentPlayerIndex].finishedRound = roundNumber;
                         setPlayers(updatedPlayers);
                         await checkForWinner(updatedPlayers);
                         return;
                     }
-                    
+
                     setPlayers(updatedPlayers);
-                    
+
                     const randomCat = getRandomCategory();
                     setCurrentCategory(randomCat);
                     const nextQuestion = getRandomQuestion(randomCat);
@@ -289,25 +289,25 @@
 
             const moveToNextPlayer = async () => {
                 const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
-                
+
                 if (nextPlayerIndex === 0) {
                     setRoundNumber(roundNumber + 1);
                 }
-                
+
                 let actualNextIndex = nextPlayerIndex;
                 let checkedPlayers = 0;
                 while (players[actualNextIndex].completedCategories.length === 6 && checkedPlayers < players.length) {
                     actualNextIndex = (actualNextIndex + 1) % players.length;
                     checkedPlayers++;
                 }
-                
+
                 if (checkedPlayers === players.length) {
                     setGameOver(true);
                     return;
                 }
-                
+
                 setCurrentPlayerIndex(actualNextIndex);
-                
+
                 const randomCat = getRandomCategory();
                 setCurrentCategory(randomCat);
                 const nextQuestion = getRandomQuestion(randomCat);
@@ -318,7 +318,7 @@
 
             const checkForWinner = async (updatedPlayers) => {
                 const finishersThisRound = updatedPlayers.filter(p => p.finishedRound === roundNumber);
-                
+
                 if (finishersThisRound.length > 1) {
                     setLoading(true);
                     setLoadingMessage("Loading tiebreaker question...");
@@ -403,7 +403,7 @@
                                 <h1 className="text-4xl font-bold text-gray-800 mb-2">Your Pie</h1>
                                 <p className="text-gray-600">How many players?</p>
                             </div>
-                            
+
                             <div className="grid grid-cols-2 gap-4 mb-8">
                                 {[2, 3, 4].map(num => (
                                     <button
@@ -430,7 +430,7 @@
                                     <li>• If multiple players finish on the same round, there's a tiebreaker!</li>
                                 </ul>
                             </div>
-                            
+
                             <button
                                 onClick={startGame}
                                 className="w-full bg-indigo-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-indigo-700 transition-colors"
@@ -450,7 +450,7 @@
                                 <h2 className="text-3xl font-bold text-gray-800 mb-2">Enter Player Names</h2>
                                 <p className="text-gray-600">All players required</p>
                             </div>
-                            
+
                             <div className="space-y-4 mb-8">
                                 {playerNames.map((name, index) => (
                                     <div key={index}>
@@ -467,7 +467,7 @@
                                     </div>
                                 ))}
                             </div>
-                            
+
                             <button
                                 onClick={() => {
                                     if (playerNames.every(name => name.trim() !== '')) {
@@ -545,7 +545,7 @@
 
             if (tiebreaker) {
                 const currentTiebreakerPlayer = tiebreakerPlayers[currentPlayerIndex];
-                
+
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center p-4">
                         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-3xl w-full border-2 border-yellow-500">
@@ -567,7 +567,7 @@
                             <div className="space-y-3 mb-8">
                                 {currentQuestion?.answers.map((answer, index) => {
                                     let buttonClass = "w-full p-4 text-left rounded-lg font-semibold transition-all border-2 ";
-                                    
+
                                     if (showResult) {
                                         if (index === currentQuestion.correct) {
                                             buttonClass += "bg-green-500 border-green-600 text-white";
@@ -674,7 +674,7 @@
                         <div className="space-y-3 mb-8">
                             {currentQuestion?.answers.map((answer, index) => {
                                 let buttonClass = "w-full p-4 text-left rounded-lg font-semibold transition-all border-2 ";
-                                
+
                                 if (showResult) {
                                     if (index === currentQuestion.correct) {
                                         buttonClass += "bg-green-500 border-green-600 text-white";
