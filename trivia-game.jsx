@@ -132,8 +132,10 @@ const TriviaGame = () => {
   const [tiebreaker, setTiebreaker] = useState(false);
   const [tiebreakerPlayers, setTiebreakerPlayers] = useState([]);
   const [showPlayerSetup, setShowPlayerSetup] = useState(false);
+  const [playerNames, setPlayerNames] = useState([]);
 
   const startGame = () => {
+    setPlayerNames(Array(numPlayers).fill(''));
     setShowPlayerSetup(true);
   };
 
@@ -202,11 +204,11 @@ const TriviaGame = () => {
       if (nextCat) {
         // Player has more categories to complete
         setCurrentCategory(nextCat);
-        const questionIndex = usedQuestionsByCategory[nextCat];
+        const questionIndex = usedQuestionsByCategory[nextCat] % shuffledQuestions[nextCat].length;
         setCurrentQuestion(shuffledQuestions[nextCat][questionIndex]);
         setUsedQuestionsByCategory({
           ...usedQuestionsByCategory,
-          [nextCat]: questionIndex + 1,
+          [nextCat]: usedQuestionsByCategory[nextCat] + 1,
         });
         setSelectedAnswer(null);
         setShowResult(false);
@@ -216,11 +218,11 @@ const TriviaGame = () => {
       }
     } else {
       // Wrong answer, give them another question in same category
-      const questionIndex = usedQuestionsByCategory[currentCategory];
+      const questionIndex = usedQuestionsByCategory[currentCategory] % shuffledQuestions[currentCategory].length;
       setCurrentQuestion(shuffledQuestions[currentCategory][questionIndex]);
       setUsedQuestionsByCategory({
         ...usedQuestionsByCategory,
-        [currentCategory]: questionIndex + 1,
+        [currentCategory]: usedQuestionsByCategory[currentCategory] + 1,
       });
       setSelectedAnswer(null);
       setShowResult(false);
@@ -266,21 +268,21 @@ const TriviaGame = () => {
       setCurrentPlayerIndex(nextIndex);
       const nextCat = getNextCategory(updatedPlayers[nextIndex]);
       setCurrentCategory(nextCat);
-      const questionIndex = usedQuestionsByCategory[nextCat];
+      const questionIndex = usedQuestionsByCategory[nextCat] % shuffledQuestions[nextCat].length;
       setCurrentQuestion(shuffledQuestions[nextCat][questionIndex]);
       setUsedQuestionsByCategory({
         ...usedQuestionsByCategory,
-        [nextCat]: questionIndex + 1,
+        [nextCat]: usedQuestionsByCategory[nextCat] + 1,
       });
     } else {
       setCurrentPlayerIndex(nextPlayerIndex);
       const nextCat = getNextCategory(updatedPlayers[nextPlayerIndex]);
       setCurrentCategory(nextCat);
-      const questionIndex = usedQuestionsByCategory[nextCat];
+      const questionIndex = usedQuestionsByCategory[nextCat] % shuffledQuestions[nextCat].length;
       setCurrentQuestion(shuffledQuestions[nextCat][questionIndex]);
       setUsedQuestionsByCategory({
         ...usedQuestionsByCategory,
-        [nextCat]: questionIndex + 1,
+        [nextCat]: usedQuestionsByCategory[nextCat] + 1,
       });
     }
     
@@ -373,8 +375,6 @@ const TriviaGame = () => {
 
   // Player names setup screen
   if (showPlayerSetup) {
-    const [playerNames, setPlayerNames] = useState(Array(numPlayers).fill(''));
-    
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
@@ -672,326 +672,6 @@ const TriviaGame = () => {
               className="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
             >
               Continue
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default TriviaGame;
-
-const TriviaGame = () => {
-  const triviaQuestions = [
-    { question: "What is the longest-running Broadway musical of all time?", answers: ["The Phantom of the Opera", "Chicago", "The Lion King", "Cats"], correct: 0, category: "Broadway Musicals" },
-    { question: "Who composed the music for 'Hamilton'?", answers: ["Stephen Sondheim", "Lin-Manuel Miranda", "Andrew Lloyd Webber", "Jonathan Larson"], correct: 1, category: "Broadway Musicals" },
-    { question: "Which musical features the song 'Defying Gravity'?", answers: ["Wicked", "Frozen", "The Wizard of Oz", "Into the Woods"], correct: 0, category: "Broadway Musicals" },
-    { question: "What year did 'The Phantom of the Opera' open on Broadway?", answers: ["1986", "1988", "1990", "1992"], correct: 1, category: "Broadway Musicals" },
-    { question: "Which musical is based on the life of Alexander Hamilton?", answers: ["1776", "Hamilton", "Bloody Bloody Andrew Jackson", "Evita"], correct: 1, category: "Broadway Musicals" },
-    { question: "Who wrote the music and lyrics for 'West Side Story'?", answers: ["Rodgers and Hammerstein", "Leonard Bernstein and Stephen Sondheim", "Kander and Ebb", "Lerner and Loewe"], correct: 1, category: "Broadway Musicals" },
-    { question: "Which musical features the characters Elphaba and Glinda?", answers: ["Wicked", "The Wizard of Oz", "Oz the Great and Powerful", "Frozen"], correct: 0, category: "Broadway Musicals" },
-    { question: "What musical is based on Victor Hugo's novel?", answers: ["The Hunchback of Notre Dame", "Les Misérables", "Sweeney Todd", "Miss Saigon"], correct: 1, category: "Broadway Musicals" },
-    { question: "Which Andrew Lloyd Webber musical is set in Argentina?", answers: ["Cats", "Evita", "Jesus Christ Superstar", "Sunset Boulevard"], correct: 1, category: "Broadway Musicals" },
-    { question: "What musical tells the story of orphan Annie?", answers: ["Oliver!", "Annie", "Newsies", "Matilda"], correct: 1, category: "Broadway Musicals" },
-  ];
-
-  const [gameStarted, setGameStarted] = useState(false);
-  const [players, setPlayers] = useState([
-    { name: '', score: 0 },
-    { name: '', score: 0 },
-    { name: '', score: 0 },
-    { name: '', score: 0 }
-  ]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [showResult, setShowResult] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
-  const [questions, setQuestions] = useState([...triviaQuestions]);
-
-  const currentQuestion = questions[currentQuestionIndex];
-
-  const handlePlayerNameChange = (index, name) => {
-    const newPlayers = [...players];
-    newPlayers[index].name = name;
-    setPlayers(newPlayers);
-  };
-
-  const startGame = () => {
-    const filledPlayers = players.filter(p => p.name.trim() !== '');
-    if (filledPlayers.length < 2) {
-      alert('Please enter at least 2 player names!');
-      return;
-    }
-    setPlayers(filledPlayers);
-    setGameStarted(true);
-  };
-
-  const handleAnswerClick = (answerIndex) => {
-    if (showResult) return;
-    
-    setSelectedAnswer(answerIndex);
-    setShowResult(true);
-    
-    if (answerIndex === currentQuestion.correct) {
-      const newPlayers = [...players];
-      newPlayers[currentPlayerIndex].score += 1;
-      setPlayers(newPlayers);
-    }
-  };
-
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex + 1 < questions.length) {
-      // More questions for current player
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedAnswer(null);
-      setShowResult(false);
-    } else {
-      // Current player finished all questions
-      const nextPlayerIndex = currentPlayerIndex + 1;
-      
-      if (nextPlayerIndex < players.length) {
-        // Move to next player
-        setCurrentPlayerIndex(nextPlayerIndex);
-        setCurrentQuestionIndex(0);
-        setSelectedAnswer(null);
-        setShowResult(false);
-      } else {
-        // All players have finished
-        setGameOver(true);
-      }
-    }
-  };
-
-  const resetGame = () => {
-    setGameStarted(false);
-    setPlayers([
-      { name: '', score: 0 },
-      { name: '', score: 0 },
-      { name: '', score: 0 },
-      { name: '', score: 0 }
-    ]);
-    setCurrentQuestionIndex(0);
-    setCurrentPlayerIndex(0);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setGameOver(false);
-  };
-
-  const playAgain = () => {
-    const resetPlayers = players.map(p => ({ ...p, score: 0 }));
-    setPlayers(resetPlayers);
-    setCurrentQuestionIndex(0);
-    setCurrentPlayerIndex(0);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setGameOver(false);
-  };
-
-  const shuffleQuestions = () => {
-    const shuffled = [...triviaQuestions].sort(() => Math.random() - 0.5);
-    setQuestions(shuffled);
-    playAgain();
-  };
-
-  // Player Setup Screen
-  if (!gameStarted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
-          <div className="text-center mb-8">
-            <Users className="w-16 h-16 mx-auto mb-4 text-purple-600" />
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Broadway Musicals Trivia</h1>
-            <p className="text-gray-600">Enter player names to begin (2-4 players)</p>
-            <p className="text-sm text-gray-500 mt-2">Each player will answer 10 questions about the Great White Way</p>
-          </div>
-          
-          <div className="space-y-4 mb-8">
-            {players.map((player, index) => (
-              <div key={index}>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Player {index + 1} {index < 2 && <span className="text-red-500">*</span>}
-                </label>
-                <input
-                  type="text"
-                  value={player.name}
-                  onChange={(e) => handlePlayerNameChange(index, e.target.value)}
-                  placeholder={`Enter name for Player ${index + 1}`}
-                  className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
-                />
-              </div>
-            ))}
-          </div>
-          
-          <button
-            onClick={startGame}
-            className="w-full bg-purple-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-purple-700 transition-colors"
-          >
-            Start Game
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Game Over Screen
-  if (gameOver) {
-    const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
-    const winner = sortedPlayers[0];
-
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
-          <div className="text-center mb-8">
-            <Trophy className="w-20 h-20 mx-auto mb-4 text-yellow-500" />
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Game Over!</h1>
-            <p className="text-2xl text-purple-600 font-semibold">
-              {winner.name} wins with {winner.score} points! 🎉
-            </p>
-          </div>
-
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">Final Scores</h2>
-            <div className="space-y-3">
-              {sortedPlayers.map((player, index) => (
-                <div
-                  key={index}
-                  className={`flex justify-between items-center p-4 rounded-lg ${
-                    index === 0
-                      ? 'bg-gradient-to-r from-yellow-100 to-yellow-200 border-2 border-yellow-400'
-                      : 'bg-gray-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl font-bold text-gray-600">
-                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''}
-                    </span>
-                    <span className="font-semibold text-lg">{player.name}</span>
-                  </div>
-                  <span className="text-2xl font-bold text-purple-600">{player.score}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex gap-4">
-            <button
-              onClick={playAgain}
-              className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
-            >
-              <RotateCcw size={20} />
-              Play Again
-            </button>
-            <button
-              onClick={shuffleQuestions}
-              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-            >
-              <Shuffle size={20} />
-              Shuffle Order
-            </button>
-            <button
-              onClick={resetGame}
-              className="flex-1 bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
-            >
-              New Players
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Game Screen
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-3xl w-full">
-        {/* Scoreboard */}
-        <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-          {players.map((player, index) => {
-            let status = '';
-            if (index < currentPlayerIndex) status = '✓ Done';
-            else if (index === currentPlayerIndex) status = '▶ Playing';
-            else status = '⏳ Waiting';
-            
-            return (
-              <div
-                key={index}
-                className={`p-3 rounded-lg text-center ${
-                  index === currentPlayerIndex
-                    ? 'bg-purple-600 text-white ring-4 ring-purple-300'
-                    : index < currentPlayerIndex
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-700'
-                }`}
-              >
-                <div className="font-bold text-sm truncate">{player.name}</div>
-                <div className="text-2xl font-bold">{player.score}</div>
-                <div className="text-xs mt-1">{status}</div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="flex justify-between items-center mb-6">
-          <div className="text-sm font-semibold text-gray-600">
-            {players[currentPlayerIndex].name}: Question {currentQuestionIndex + 1} of {questions.length}
-          </div>
-          <span className="inline-block bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full">
-            {currentQuestion.category}
-          </span>
-        </div>
-
-        <div className="mb-6 p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
-          <p className="text-center text-purple-800 font-semibold">
-            {players[currentPlayerIndex].name}'s Turn
-          </p>
-        </div>
-
-        <h2 className="text-2xl font-bold text-gray-800 mb-8">
-          {currentQuestion.question}
-        </h2>
-
-        <div className="space-y-3 mb-8">
-          {currentQuestion.answers.map((answer, index) => {
-            let buttonClass = "w-full p-4 text-left rounded-lg font-semibold transition-all border-2 ";
-            
-            if (showResult) {
-              if (index === currentQuestion.correct) {
-                buttonClass += "bg-green-100 border-green-500 text-green-800";
-              } else if (index === selectedAnswer) {
-                buttonClass += "bg-red-100 border-red-500 text-red-800";
-              } else {
-                buttonClass += "bg-gray-100 border-gray-300 text-gray-600";
-              }
-            } else {
-              buttonClass += "bg-white border-gray-300 text-gray-800 hover:bg-purple-50 hover:border-purple-400 cursor-pointer";
-            }
-
-            return (
-              <button
-                key={index}
-                onClick={() => handleAnswerClick(index)}
-                disabled={showResult}
-                className={buttonClass}
-              >
-                {answer}
-              </button>
-            );
-          })}
-        </div>
-
-        {showResult && (
-          <div className="text-center">
-            <button
-              onClick={handleNextQuestion}
-              className="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
-            >
-              {currentQuestionIndex === questions.length - 1
-                ? currentPlayerIndex === players.length - 1
-                  ? "See Final Results"
-                  : `Next Player: ${players[currentPlayerIndex + 1].name}`
-                : "Next Question"}
             </button>
           </div>
         )}
