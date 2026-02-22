@@ -58,6 +58,81 @@
 
             const categories = ["Geography", "Pop Culture", "History", "Art & Literature", "Science", "Sports"];
 
+            const fallbackQuestions = {
+                "Geography": [
+                    { question: "What is the capital of Australia?", answers: ["Sydney", "Melbourne", "Canberra", "Brisbane"], correct: 2, id: "geo1" },
+                    { question: "Which river is the longest in the world?", answers: ["Amazon", "Nile", "Yangtze", "Mississippi"], correct: 1, id: "geo2" },
+                    { question: "How many countries are in Africa?", answers: ["48", "52", "54", "58"], correct: 2, id: "geo3" },
+                    { question: "What is the smallest country in the world?", answers: ["Monaco", "Vatican City", "San Marino", "Liechtenstein"], correct: 1, id: "geo4" },
+                    { question: "Which ocean is the largest?", answers: ["Atlantic", "Indian", "Arctic", "Pacific"], correct: 3, id: "geo5" },
+                    { question: "What is the capital of Canada?", answers: ["Toronto", "Ottawa", "Vancouver", "Montreal"], correct: 1, id: "geo6" },
+                    { question: "Which desert is the largest in the world?", answers: ["Sahara", "Arabian", "Gobi", "Antarctic"], correct: 3, id: "geo7" },
+                    { question: "What mountain range separates Europe from Asia?", answers: ["Himalayas", "Alps", "Ural Mountains", "Andes"], correct: 2, id: "geo8" },
+                    { question: "Which country has the most natural lakes?", answers: ["United States", "Russia", "Canada", "Brazil"], correct: 2, id: "geo9" },
+                    { question: "What is the capital of Brazil?", answers: ["Rio de Janeiro", "São Paulo", "Brasília", "Salvador"], correct: 2, id: "geo10" },
+                ],
+                "Pop Culture": [
+                    { question: "Who directed the movie 'Inception'?", answers: ["Steven Spielberg", "Christopher Nolan", "Martin Scorsese", "Quentin Tarantino"], correct: 1, id: "pop1" },
+                    { question: "Which band released the album 'Abbey Road'?", answers: ["The Rolling Stones", "Led Zeppelin", "The Beatles", "Pink Floyd"], correct: 2, id: "pop2" },
+                    { question: "What year was the first iPhone released?", answers: ["2005", "2006", "2007", "2008"], correct: 2, id: "pop3" },
+                    { question: "Which artist released the album 'Thriller' in 1982?", answers: ["Prince", "Michael Jackson", "Madonna", "Whitney Houston"], correct: 1, id: "pop4" },
+                    { question: "What TV show features a chemistry teacher turned drug manufacturer?", answers: ["Breaking Bad", "Better Call Saul", "Ozark", "The Wire"], correct: 0, id: "pop5" },
+                    { question: "Who played Jack Dawson in Titanic?", answers: ["Brad Pitt", "Tom Cruise", "Leonardo DiCaprio", "Matt Damon"], correct: 2, id: "pop6" },
+                    { question: "What is the highest-grossing film of all time?", answers: ["Avatar", "Avengers: Endgame", "Titanic", "Star Wars"], correct: 0, id: "pop7" },
+                    { question: "Who is known as the 'King of Pop'?", answers: ["Elvis Presley", "Michael Jackson", "Prince", "Freddie Mercury"], correct: 1, id: "pop8" },
+                    { question: "Which streaming service created 'Stranger Things'?", answers: ["Hulu", "Amazon Prime", "Netflix", "Disney+"], correct: 2, id: "pop9" },
+                    { question: "Who wrote the Harry Potter book series?", answers: ["J.R.R. Tolkien", "C.S. Lewis", "J.K. Rowling", "Suzanne Collins"], correct: 2, id: "pop10" },
+                ],
+                "History": [
+                    { question: "What year did the Berlin Wall fall?", answers: ["1987", "1989", "1991", "1985"], correct: 1, id: "hist1" },
+                    { question: "Who was the first person to walk on the moon?", answers: ["Buzz Aldrin", "Neil Armstrong", "Yuri Gagarin", "Alan Shepard"], correct: 1, id: "hist2" },
+                    { question: "Which ancient wonder is the only one still standing?", answers: ["Colossus of Rhodes", "Hanging Gardens", "Great Pyramid of Giza", "Lighthouse of Alexandria"], correct: 2, id: "hist3" },
+                    { question: "In what year did World War II end?", answers: ["1943", "1944", "1945", "1946"], correct: 2, id: "hist4" },
+                    { question: "Who was the first President of the United States?", answers: ["Thomas Jefferson", "George Washington", "John Adams", "Benjamin Franklin"], correct: 1, id: "hist5" },
+                    { question: "What year did Christopher Columbus reach the Americas?", answers: ["1482", "1492", "1502", "1512"], correct: 1, id: "hist6" },
+                    { question: "Which empire built Machu Picchu?", answers: ["Aztec", "Maya", "Inca", "Olmec"], correct: 2, id: "hist7" },
+                    { question: "Who was the first Roman Emperor?", answers: ["Julius Caesar", "Augustus", "Nero", "Caligula"], correct: 1, id: "hist8" },
+                    { question: "In what year did the Titanic sink?", answers: ["1910", "1912", "1914", "1916"], correct: 1, id: "hist9" },
+                    { question: "Who discovered penicillin?", answers: ["Louis Pasteur", "Alexander Fleming", "Marie Curie", "Jonas Salk"], correct: 1, id: "hist10" },
+                ],
+                "Art & Literature": [
+                    { question: "Who wrote '1984'?", answers: ["Aldous Huxley", "George Orwell", "Ray Bradbury", "Ernest Hemingway"], correct: 1, id: "art1" },
+                    { question: "Who painted the Sistine Chapel ceiling?", answers: ["Leonardo da Vinci", "Raphael", "Michelangelo", "Donatello"], correct: 2, id: "art2" },
+                    { question: "Which artist cut off part of his own ear?", answers: ["Pablo Picasso", "Vincent van Gogh", "Claude Monet", "Salvador Dalí"], correct: 1, id: "art3" },
+                    { question: "Who wrote 'Romeo and Juliet'?", answers: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"], correct: 1, id: "art4" },
+                    { question: "Who painted 'The Starry Night'?", answers: ["Claude Monet", "Vincent van Gogh", "Pablo Picasso", "Edvard Munch"], correct: 1, id: "art5" },
+                    { question: "Which author created Sherlock Holmes?", answers: ["Agatha Christie", "Edgar Allan Poe", "Arthur Conan Doyle", "Charles Dickens"], correct: 2, id: "art6" },
+                    { question: "What art movement is Salvador Dalí associated with?", answers: ["Impressionism", "Cubism", "Surrealism", "Expressionism"], correct: 2, id: "art7" },
+                    { question: "Who wrote 'The Great Gatsby'?", answers: ["Ernest Hemingway", "F. Scott Fitzgerald", "John Steinbeck", "William Faulkner"], correct: 1, id: "art8" },
+                    { question: "Who wrote 'Pride and Prejudice'?", answers: ["Charlotte Brontë", "Emily Brontë", "Jane Austen", "Mary Shelley"], correct: 2, id: "art9" },
+                    { question: "Who wrote 'The Odyssey'?", answers: ["Virgil", "Homer", "Sophocles", "Euripides"], correct: 1, id: "art10" },
+                ],
+                "Science": [
+                    { question: "What is the chemical symbol for gold?", answers: ["Go", "Gd", "Au", "Ag"], correct: 2, id: "sci1" },
+                    { question: "What is the largest planet in our solar system?", answers: ["Saturn", "Jupiter", "Neptune", "Uranus"], correct: 1, id: "sci2" },
+                    { question: "How many bones are in the adult human body?", answers: ["196", "206", "216", "226"], correct: 1, id: "sci3" },
+                    { question: "What is H2O commonly known as?", answers: ["Hydrogen peroxide", "Water", "Oxygen", "Salt"], correct: 1, id: "sci4" },
+                    { question: "What planet is known as the Red Planet?", answers: ["Venus", "Mars", "Jupiter", "Saturn"], correct: 1, id: "sci5" },
+                    { question: "What is the powerhouse of the cell?", answers: ["Nucleus", "Ribosome", "Mitochondria", "Chloroplast"], correct: 2, id: "sci6" },
+                    { question: "What gas do plants absorb from the atmosphere?", answers: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], correct: 2, id: "sci7" },
+                    { question: "What is the hardest natural substance on Earth?", answers: ["Gold", "Iron", "Diamond", "Titanium"], correct: 2, id: "sci8" },
+                    { question: "What is the chemical formula for table salt?", answers: ["NaCl", "KCl", "CaCl2", "MgCl2"], correct: 0, id: "sci9" },
+                    { question: "How many chambers does the human heart have?", answers: ["2", "3", "4", "5"], correct: 2, id: "sci10" },
+                ],
+                "Sports": [
+                    { question: "How many players are on a soccer team on the field?", answers: ["9", "10", "11", "12"], correct: 2, id: "spo1" },
+                    { question: "In what country were the first modern Olympics held?", answers: ["France", "Greece", "Italy", "England"], correct: 1, id: "spo2" },
+                    { question: "What is the diameter of a basketball hoop in inches?", answers: ["16", "18", "20", "22"], correct: 1, id: "spo3" },
+                    { question: "How many points is a touchdown worth in American football?", answers: ["5", "6", "7", "8"], correct: 1, id: "spo4" },
+                    { question: "What sport is known as 'the beautiful game'?", answers: ["Basketball", "Soccer", "Tennis", "Baseball"], correct: 1, id: "spo5" },
+                    { question: "How many strikes are in a perfect game of bowling?", answers: ["10", "11", "12", "13"], correct: 2, id: "spo6" },
+                    { question: "In golf, what is one under par called?", answers: ["Bogey", "Birdie", "Eagle", "Albatross"], correct: 1, id: "spo7" },
+                    { question: "How long is a marathon?", answers: ["24.2 miles", "25.2 miles", "26.2 miles", "27.2 miles"], correct: 2, id: "spo8" },
+                    { question: "How many periods are in a hockey game?", answers: ["2", "3", "4", "5"], correct: 1, id: "spo9" },
+                    { question: "In tennis, what does 'love' mean?", answers: ["Game point", "Zero", "Tie", "Match point"], correct: 1, id: "spo10" },
+                ],
+            };
+
             // Game mode states
             const [gameMode, setGameMode] = useState('menu'); // 'menu', 'host', 'join', 'lobby', 'playing'
             const [roomCode, setRoomCode] = useState('');
@@ -283,6 +358,7 @@
                 }
 
                 setLoading(true);
+                setLoadingMessage("Starting game...");
 
                 try {
                     const initialUsed = {};
@@ -290,30 +366,14 @@
                         initialUsed[cat] = [];
                     });
 
+                    // Use built-in fallback questions, shuffled for variety
                     const cache = {};
-                    for (let i = 0; i < categories.length; i++) {
-                        const cat = categories[i];
-                        setLoadingMessage(`Loading ${cat} questions... (${i + 1}/${categories.length})`);
-                        const questions = await fetchQuestions(cat, 10);
-                        cache[cat] = questions;
+                    categories.forEach(cat => {
+                        cache[cat] = [...fallbackQuestions[cat]].sort(() => Math.random() - 0.5);
+                    });
 
-                        // OpenTriviaDB rate limit: 1 request per 5 seconds
-                        if (i < categories.length - 1) {
-                            await sleep(5500);
-                        }
-                    }
-
-                    // Check that we got questions for at least some categories
-                    const loadedCategories = categories.filter(cat => cache[cat] && cache[cat].length > 0);
-                    if (loadedCategories.length === 0) {
-                        alert('Could not load any questions. The trivia API may be down. Please try again later.');
-                        setLoading(false);
-                        setLoadingMessage("");
-                        return;
-                    }
-
-                    const randomCat = loadedCategories[Math.floor(Math.random() * loadedCategories.length)];
-                    const firstQuestion = cache[randomCat][Math.floor(Math.random() * cache[randomCat].length)];
+                    const randomCat = categories[Math.floor(Math.random() * categories.length)];
+                    const firstQuestion = cache[randomCat][0];
 
                     initialUsed[randomCat] = [firstQuestion.id];
 
